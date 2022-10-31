@@ -23,11 +23,16 @@ def Sx_ctrl_assessment():
     # * catalog queries
 
     Sx_ctrl_factors = {
-        # over the last 4 weeks…
-        0: ["Daytime symptoms more than twice/week?", None],
-        1: ["Any night waking due to asthma?", None],
-        2: ["SABA reliever needed more than twice/week?", None],
-        3: ["Any activity limitation due to asthma?", None]
+
+
+        # over the last 4 weeks… # todo: put this in the online form
+
+        # todo: reconcile the Sx-control assessment w/ Tx steps
+        0: ["Number of daytime symptoms/week", None],        # int
+        1: ["Night-waking from symptoms ≥1/week?", None],    # bool
+        2: ["SABA reliever needed >2/week?", None],          # bool
+        # implies Sx > x4-5/week
+        3: ["Any activity limitation due to asthma?", None]  # bool
     }
 
     # ----------------------------------------------------------
