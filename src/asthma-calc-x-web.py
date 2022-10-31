@@ -12,7 +12,7 @@ Created: 2022-10-17 02:24:01
 
 # * Import libraries
 
-import pandas as pd
+#import pandas as pd
 from PIL import Image
 import streamlit as st
 
@@ -33,7 +33,7 @@ st.set_page_config(
 
 st.write("""
 # Asthma Calc-X
-## Classifies asthma severity per 2020 GINA criteria
+## Classifies asthma severity per 2022 GINA criteria
 """)
 
 # ----------------------------------------------------------
@@ -67,7 +67,7 @@ def get_user_data():
         "A7": ["Asthmatic-awakening >0 per month", "st.sidebar.radio(v[0],[True,False],index=1,horizontal=True)"],
         "A8": ["Asthma-limited physical activity", "st.sidebar.radio(v[0],[True,False],index=1,horizontal=True)"]
 
-        # @ not 2020 GINA criteria
+        # @ not 2022 GINA criteria
         # 'A10': ['asthma triggers', "st.sidebar.radio(v[0],[True,False],index=1,horizontal=True)"],
         # 'A11': ['atopy (personal or FMH)', "st.sidebar.radio(v[0],[True,False],index=1,horizontal=True)"],
         # 'A12': ['characteristic musical wheezing on PE', "st.sidebar.radio(v[0],[True,False],index=1,horizontal=True)"],
@@ -100,6 +100,10 @@ def assess_user_data(data):
 
     asthma_class = {
         "H4": "acute exacerbation",
+        # The 4 classes below describe severity;
+        # which is assessed retrospectively (post ≥ 2 months of Tx)
+        # via Tx-level required to control Sx & exacerbations
+        # Thus, newly diagnosed asthma cannot have a severity
         "H6": "intermittent asthma",
         "H8": "mild persistent asthma",
         "H10": "moderate persistent asthma",
