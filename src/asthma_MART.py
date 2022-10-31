@@ -8,234 +8,302 @@ Created: 2022-10-19 03:29:11
 
 # * ----------------------------------------------------------
 # * UPDATE:
+# 2022-10-27 23:47:39.000-05:00
+# + changed lists to tuples for less memory consumption & faster iteration
+# + corrected preferred controller from budesonide-formoterol to any ICS-formoterol
+
 # + all track functions working
 # + all ICS functions working
 
 # todo:
 # @ create A&P algorithms
 # @ figure out what to do w/ Rx variables
+# @ finish the consolidated ICS function
+# @ find the function you want to slice [:]
+
+# * ----------------------------------------------------------
+
+# import streamlit as st
 
 # * ----------------------------------------------------------
 
 
 def get_LD_ICS():
     '''
-    returns all dict entries correlating to LD_ICS formulations
+    O: all dict entries correlating to LD_ICS formulations
     '''
-    return "\n".join([f"{k2} {v2[1][0][0]}{v2[2]} {v2[0]}" for k, v in ICS.items() for k2, v2 in v.items()])
+    # Time complexity: O(1) # Rx's have fixed qty & dose ranges
+    return "\n".join([f"{k2} {v2[1][0][0]}{v2[2]} {v2[0]}" for k, v in ICS.items()
+                      for k2, v2 in v.items()])
 
+
+# return {char: uc_str[(uc_str.index(char) + shift) % 26] for char in uc_str} | {char: lc_str[(lc_str.index(char) + shift) % 26] for char in lc_str}
 # * ----------------------------------------------------------
 
 
 def get_MD_ICS():
     '''
-    returns all dict entries correlating to MD_ICS formulations
+    O: all dict entries correlating to MD_ICS formulations
     '''
-    return "\n".join([f"{k2} {v2[1][1][0]}{v2[2]} {v2[0]}" for k, v in ICS.items() for k2, v2 in v.items()])
+    # Time complexity: O(1) # Rx's have fixed qty & dose ranges
+    return "\n".join([f"{k2} {v2[1][1][0]}{v2[2]} {v2[0]}" for k, v in ICS.items()
+                      for k2, v2 in v.items()])
 # * ----------------------------------------------------------
 
 
 def get_HD_ICS():
     '''
-    returns all dict entries correlating to HD_ICS formulations
+    O: all dict entries correlating to HD_ICS formulations
     '''
-    return "\n".join([f"{k2} {v2[1][2][0]}{v2[2]} {v2[0]}" for k, v in ICS.items() for k2, v2 in v.items()])
+    # Time complexity: O(1) # Rx's have fixed qty & dose ranges
+    return "\n".join([f"{k2} {v2[1][2][0]}{v2[2]} {v2[0]}" for k, v in ICS.items()
+                      for k2, v2 in v.items()])
+# * ----------------------------------------------------------
+
+# todo: finish this consolidated function of the above three
+
+
+def get_ICS(dose):
+    '''
+    I: int: correlating to dose index in ICS dict i.e., 0=low, 1=medium, 2=high
+    O: all dict entries correlating to HD_ICS formulations
+
+    argument is provided by other fxn TBD (get_track?)
+    '''
+    # Time complexity: O(1) # Rx's have fixed qty & dose ranges
+    return "\n".join([f"{k2} {v2[1][dose][0]}{v2[2]} {v2[0]}" for k, v in ICS.items()
+                      for k2, v2 in v.items()])
+
+
 # * ----------------------------------------------------------
 
 
 def get_track(track):
     '''
-    I: int correlating to track number
-    O: GINA steps to respective track
+    I: int; of track number
+    O: str; of GINA steps per respective track
+
+    argument provided by fxn TBD
+    use: informational; another fxn (TBD) will return exact step per track
     '''
+    # Time complexity: O(1) # Rx's have fixed qty & dose ranges
+    return "\n".join([f"{k1} {k2}: {' + '.join(v2[track-1])}" for k1, v1 in GINA_Tx_steps.items()
+                      for k2, v2 in v1.items()])
+# * ----------------------------------------------------------
+
+
+def get_step(track):
+    '''
+    I: int; of track number
+    O: str; of GINA steps per respective track
+
+    argument provided by fxn TBD
+    use: recommended Tx per Dx status
+    '''
+    # Time complexity: O(1) # Rx's have fixed qty & dose ranges
     return "\n".join([f"{k1} {k2}: {', '.join(v2[track-1])}" for k1, v1 in GINA_Tx_steps.items()
                       for k2, v2 in v1.items()])
 
 # * ----------------------------------------------------------
 
 
-BDP = ["beclometasone dipropionate", "BDP"]
-DPI = ["dry powder inhaler", "DPI"]
-HFA = ["hydrofluoroalkane propellant", "HFA"]
+BDP = "beclometasone dipropionate"
+bud = "budesonide"
+cic = "ciclesonide"
+FP = "fluticasone propionate"
+FF = "fluticasone furoate"
+MF = "mometasone furoate"
+
+DPI = ("dry powder inhaler", "DPI")
+HFA = ("hydrofluoroalkane propellant", "HFA")
 # ICS by pMDI should preferably be used with a spacer
-pMDI = ["pressurized metered dose inhaler", "pMDI"]
-pMDI_snp = [pMDI[0] + "_standard (non-fine) particle", "pMDI_snp"]
+pMDI = ("pressurized metered dose inhaler", "pMDI")
+pMDI_snp = (pMDI[0] + "_standard (non-fine) particle", "pMDI_snp")
 unit = "mcg"
 
 # * ----------------------------------------------------------
 
 # todo: replace these w/ literal substitutes
-LD_ICS_FALABA = "budesonide-formoterol"
+LD_ICS_formoterol = "LD-ICS-formoterol"
 SABA = "SABA (albuterol, Levalbuterol, etc.)"
 
 # * ----------------------------------------------------------
 
 qD_controller_adherence_likely = None
 
-LD_ICS = "LD_ICS"   # get_LD_ICS()
-MD_ICS = "MD_ICS"   # get_MD_ICS()
-HD_ICS = "HD_ICS"   # get_HD_ICS()
+LD_ICS = "LD-ICS"   # get_LD_ICS()
+MD_ICS = "MD-ICS"   # get_MD_ICS()
+HD_ICS = "HD-ICS"   # get_HD_ICS()
 
 LD_ICS_LABA = "LD-ICS-LABA"
 MD_ICS_formoterol = "MD-ICS-formoterol"
 MHD_ICS_LABA = "Medium/High-dose ICS-LABA"
 LAMA = "LAMA"
 
+
+# ! ----------------------------------------------------------
+# per minimum req for Sx ctrl
+severity = {
+    "severe": ("high-dose ICS-LABA"),
+    "mild": ("PRN-ICS-formoterol", "low-dose ICS"),
+    "moderate": ("medium-dose ICS-LABA")
+}
+# ! ----------------------------------------------------------
 # * ----------------------------------------------------------
 
 # Table shows metered doses
 ICS = {
     0: {
         # Name
-        "BDP": [
+        BDP: (
             # Route
             "(pMDI_snp, HFA)",
-            [
+            (
                 # low-dose
-                ["200-500"],
+                ("200-500",),
                 # medium-dose
-                ["500-1000"],
+                ("500-1000",),
                 # high-dose
-                [">1000"]
-            ],
+                (">1000",)
+            ),
             unit
-        ]
+        )
     },
 
     1: {
         # Name
-        "BDP":  [
+        BDP:  (
             # Route
             "(DPI or pMDI, extrafine particle, HFA)",
-            [
+            (
                 # low-dose
-                ["100-200"],
+                ("100-200",),
                 # medium-dose
-                ["200-400"],
+                ("200-400",),
                 # high-dose
-                [">400"]
-            ],
+                (">400",)
+            ),
             unit
-        ]
+        )
     },
 
     2: {
         # Name
-        "Budesonide": [
+        bud: (
             # Route
             "(DPI or pMDI_snp, HFA)",
-            [
+            (
                 # low-dose
-                ["200-400"],
+                ("200-400",),
                 # medium-dose
-                ["400-800"],
+                ("400-800",),
                 # high-dose
-                [">800"]
-            ],
+                (">800",)
+            ),
             unit
-        ]
+        )
     },
 
     3: {
         # Name
-        "Ciclesonide": [
+        cic: (
             # Route
             "(pMDI, extrafine particle, HFA)",
-            [
+            (
                 # low-dose
-                ["80-160"],
+                ("80-160",),
                 # medium-dose
-                ["160-320"],
+                ("160-320",),
                 # high-dose
-                [">320"]
-            ],
+                (">320",)
+            ),
             unit
-        ]
+        )
     },
 
     4: {
         # Name
-        "Fluticasone furoate": [
+        FF: (
             # Route
             "(DPI)",
-            [
+            (
                 # low-dose
-                ["100"],
+                ("100",),
                 # medium-dose
-                ["100"],
+                ("100",),
                 # high-dose
-                ["200"]
-            ],
+                ("200",)
+            ),
             unit
-        ]
+        )
     },
 
     5: {
         # Name
-        "Fluticasone propionate": [
+        FP: (
             # Route
             "(DPI)",
-            [
+            (
                 # low-dose
-                ["100-250"],
+                ("100-250",),
                 # medium-dose
-                ["250-500"],
+                ("250-500",),
                 # high-dose
-                [">500"]
-            ],
+                (">500",)
+            ),
             unit
-        ]
+        )
     },
 
     6: {
         # Name
-        "Fluticasone propionate": [
+        FP: (
             # Route
             "(pMDI_snp, HFA)",
-            [
+            (
                 # low-dose
-                ["100-250"],
+                ("100-250",),
                 # medium-dose
-                ["250-500"],
+                ("250-500",),
                 # high-dose
-                [">500"]
-            ],
+                (">500",)
+            ),
             unit
-        ]
+        )
     },
 
     7: {
         # Name
-        "Mometasone furoate": [
+        MF: (
             # Route
             "(DPI)",
-            [
+            (
                 # low-dose
-                ["(device-dependent dosage)"],
+                ("(device-dependent dosage)",),
                 # medium-dose
-                ["(device-dependent dosage)"],
+                ("(device-dependent dosage)",),
                 # high-dose
-                ["(device-dependent dosage)"]
-            ],
+                ("(device-dependent dosage)",)
+            ),
             ""
-        ]
+        )
     },
 
     8: {
         # Name
-        "Mometasone furoate": [
+        MF: (
             # Route
             "(pMDI_snp}, HFA)",
-            [
+            (
                 # low-dose
-                ["200-400"],
+                ("200-400",),
                 # medium-dose
-                ["200-400"],
+                ("200-400",),
                 # high-dose
-                ["400"]
-            ],
+                ("400",)
+            ),
             unit
-        ]
+        )
     }
 }
 # * ----------------------------------------------------------
@@ -243,120 +311,91 @@ ICS = {
 
 # pre_reqs
 
-# 1. confirm Dx
-# 2. assess Sx_ctrl
-# 3. assess modifiable_RF
-# 4. assess comorbidities
-# 5. assess inhaler_technique
-# 6. assess inhaler_adherence
-# 7. assess patient_prefs_goals
-
-# 8. determine appropriate track via qD_"controller"_adherence_likelihood
+# ! 1. confirm Dx
+# + 2. assess Sx_ctrl
+# ! 3. assess modifiable_RF
+# ! 4. assess comorbidities
+# ! 5. assess inhaler_technique
+# ! 6. assess inhaler_adherence
+# ! 7. assess patient_prefs_goals
+# ! 8. assess likelihood of daily controller adherence
 
 # * ----------------------------------------------------------
 
 GINA_Tx_steps = {
-    "step_1": {
-        "controller": [
+    "step-1": {
+        "controller": (
             # Track 1
-            ["None"],
+            ("None",),
             # Track 2
-            ["None"]
-        ],
-        "reliever": [
+            ("None",)
+        ),
+        "reliever": (
             # Track 1
-            [LD_ICS_FALABA],
+            (LD_ICS_formoterol,),
             # Track 2
-            [SABA, LD_ICS]
-        ]
+            (SABA, LD_ICS,)
+        )
     },
-    "step_2": {
-        "controller": [
+    "step-2": {
+        "controller": (
             # Track 1
-            ["None"],
+            ("None",),
             # Track 2
-            [LD_ICS]
-        ],
-        "reliever": [
+            (LD_ICS,)
+        ),
+        "reliever": (
             # Track 1
-            [LD_ICS_FALABA],
+            (LD_ICS_formoterol,),
             # Track 2
-            [SABA]
-        ]
+            (SABA,)
+        )
     },
-    "step_3": {
-        "controller": [
+    "step-3": {
+        "controller": (
             # Track 1
-            [LD_ICS_FALABA],
+            (LD_ICS_formoterol,),
             # Track 2
-            [LD_ICS_LABA]
-        ],
-        "reliever": [
+            (LD_ICS_LABA,)
+        ),
+        "reliever": (
             # Track 1
-            [LD_ICS_FALABA],
+            (LD_ICS_formoterol,),
             # Track 2
-            [SABA]
-        ]
+            (SABA,)
+        )
 
     },
-    "step_4": {
-        "controller": [
+    "step-4": {
+        "controller": (
             # Track 1
-            [MD_ICS_formoterol],
+            (MD_ICS_formoterol,),
             # Track 2
-            [MHD_ICS_LABA]
-        ],
-        "reliever": [
+            (MHD_ICS_LABA,)
+        ),
+        "reliever": (
             # Track 1
-            [LD_ICS_FALABA],
+            (LD_ICS_formoterol,),
             # Track 2
-            [SABA]
-        ]
+            (SABA,)
+        )
     },
-    "step_5": {
-        "controller": [
+    "step-5": {
+        "controller": (
             # Track 1
-            [MD_ICS_formoterol, LAMA],
+            (MD_ICS_formoterol, LAMA),
             # Track 2
-            [MHD_ICS_LABA, LAMA]
-        ],
-        "reliever": [
+            (MHD_ICS_LABA, LAMA)
+        ),
+        "reliever": (
             # Track 1
-            [LD_ICS_FALABA],
+            (LD_ICS_formoterol,),
             # Track 2
-            [SABA]
-        ]
+            (SABA,)
+        )
     },
 }
 
-# @ ----------------------------------------------------------
-
-# @ todo: finish A&P algorithm
-
-# if qD_controller_adherence_likely:
-#     take_track_1
-# else:
-#     take_track_2
-
-# ----------------------------------------------------------
-
-# if not Tx_status:
-#     if Sx < 2 qMo and not exacerbation_RF:
-#         step_1
-# else:
-#     if asthma == well_controlled on current_step  # step_2
-#     step_down(current_step)
-#     else:
-#         step_up(current_step)
-
-# Tx_status = {
-#     0: [“naive”, None],
-#     1: [step_1], None,
-#     2: [],
-#     3: [],
-#     4: [],
-#     5: []
-# }
 
 # @ --------------------------------------------- @
 # @                   TESTING                     @
@@ -397,4 +436,12 @@ print("     HD-ICS         ")
 print("--------------------")
 # ----------------------------------------------------------
 print(get_HD_ICS())
+# ----------------------------------------------------------
+print("")
+print("--------------------")
+print("     HD-ICS         ")
+print("--------------------")
+# ----------------------------------------------------------
+dose = 2
+print(get_ICS(dose))
 # ----------------------------------------------------------
